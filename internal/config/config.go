@@ -36,7 +36,7 @@ func DefaultPath() (string, error) {
 // Load returns an empty configuration when no session has been configured.
 func Load(path string) (Config, error) {
 	var c Config
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) // #nosec G304 -- explicit user-selected local configuration.
 	if errors.Is(err, os.ErrNotExist) {
 		return c, nil
 	}
@@ -65,11 +65,11 @@ func Save(path string, c Config) error {
 	}
 	defer os.Remove(f.Name())
 	if _, err := f.Write(append(data, '\n')); err != nil {
-		f.Close()
+		_ = f.Close()
 		return err
 	}
 	if err := f.Sync(); err != nil {
-		f.Close()
+		_ = f.Close()
 		return err
 	}
 	if err := f.Close(); err != nil {

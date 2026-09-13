@@ -55,7 +55,7 @@ func ParseCookies(r io.Reader, now time.Time) ([]*http.Cookie, error) {
 		if fields[1] != "TRUE" && fields[1] != "FALSE" || fields[3] != "TRUE" && fields[3] != "FALSE" {
 			return nil, fmt.Errorf("cookie line %d: invalid boolean", line)
 		}
-		c := &http.Cookie{Name: fields[5], Value: fields[6], Path: fields[2], Secure: true}
+		c := &http.Cookie{Name: fields[5], Value: fields[6], Path: fields[2], Secure: true, HttpOnly: true, SameSite: http.SameSiteLaxMode}
 		// Host-only cookies must retain their host when reloaded into a jar.
 		c.Domain = fields[0]
 		if seconds > 0 {
