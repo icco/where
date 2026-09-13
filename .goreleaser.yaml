@@ -1,11 +1,40 @@
 # GoReleaser configuration.
 # https://goreleaser.com
 version: 2
-project_name: PROJECT_NAME
-# This is a library, not a command: there is nothing to compile or ship. The
-# release exists for the changelog and the tag that `go get` resolves against.
+project_name: where
+before:
+  hooks:
+    - go mod download
+    - mkdir -p completions
+    - sh -c 'go run . completion bash > completions/where.bash'
+    - sh -c 'go run . completion zsh > completions/_where'
+    - sh -c 'go run . completion fish > completions/where.fish'
 builds:
-  - skip: true
+  - id: where
+    main: .
+    binary: where
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.CommitSHA={{.Commit}}
+archives:
+  - files:
+      - README.md
+      - LICENSE
+      - THIRD_PARTY_NOTICES.md
+      - completions/*
+checksum:
+  name_template: checksums.txt
+snapshot:
+  version_template: '{{ .Tag }}-next'
 changelog:
   use: git
   sort: asc
@@ -24,13 +53,36 @@ changelog:
       - '^test:'
       - '^chore:'
       - '^style:'
+homebrew_casks:
+  - name: where
+    directory: Casks
+    repository:
+      owner: icco
+      name: homebrew-tap
+      token: '{{ .Env.GH_PAT }}'
+    homepage: https://github.com/icco/where
+    description: Shared locations and local times for your people
+    binaries:
+      - where
+    completions:
+      bash: completions/where.bash
+      zsh: completions/_where
+      fish: completions/where.fish
+    caveats: In zsh, use `command where` to bypass the shell's built-in `where`. Google uses imported Maps browser cookies. Apple requires a signed-in macOS Find My session and Accessibility/Automation permission.
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/where"]
+          end
 release:
   github:
     owner: icco
-    name: PROJECT_NAME
+    name: where
   mode: replace
   footer: |
     ---
-    Install with `go get github.com/icco/PROJECT_NAME@{{ .Tag }}`.
+    Install on macOS with `brew install --cask icco/tap/where`.
+    Or use `go install github.com/icco/where@{{ .Tag }}`.
 
-    **Full Changelog**: https://github.com/icco/PROJECT_NAME/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://github.com/icco/where/compare/{{ .PreviousTag }}...{{ .Tag }}
