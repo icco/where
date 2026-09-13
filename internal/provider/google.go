@@ -57,7 +57,7 @@ func ParseCookies(r io.Reader, now time.Time) ([]*http.Cookie, error) {
 		}
 		c := &http.Cookie{Name: fields[5], Value: fields[6], Path: fields[2], Secure: true, HttpOnly: true, SameSite: http.SameSiteLaxMode}
 		// Host-only cookies must retain their host when reloaded into a jar.
-		c.Domain = fields[0]
+		c.Domain = strings.ToLower(fields[0])
 		if seconds > 0 {
 			c.Expires = time.Unix(seconds, 0)
 		}
@@ -105,7 +105,7 @@ func (g Google) People(ctx context.Context) ([]Person, error) {
 		if c == nil {
 			continue
 		}
-		domain := strings.TrimPrefix(c.Domain, ".")
+		domain := strings.ToLower(strings.TrimPrefix(c.Domain, "."))
 		if domain != "google.com" && domain != "www.google.com" {
 			continue
 		}

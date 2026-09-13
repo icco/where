@@ -67,14 +67,14 @@ func parseApple(data []byte) ([]Person, error) {
 			}
 		}
 		if overlap == 0 && len(rows) > 0 {
-			return nil, errors.New("find My People pages did not overlap; cannot guarantee a complete list")
+			return nil, errors.New("cannot read a complete Find My People list: pages did not overlap")
 		}
 		rows = append(rows[:len(rows)-overlap], page...)
 	}
 	people := make([]Person, 0, len(rows))
 	for _, row := range rows {
 		if strings.TrimSpace(row.Name) == "" {
-			return nil, errors.New("find My returned an unnamed person")
+			return nil, errors.New("received an unnamed person from Find My")
 		}
 		location, freshness, _ := strings.Cut(row.Location, "•")
 		p := Person{Name: row.Name, Provider: "apple", LocationText: strings.TrimSpace(location), Status: row.Status}

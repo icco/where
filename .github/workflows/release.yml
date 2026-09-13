@@ -41,7 +41,7 @@ jobs:
           minor_pattern: /feat(\(.+\))?:/
           version_format: ${major}.${minor}.${patch}
       - name: Create and push tag
-        if: github.ref_type != 'tag' && steps.versioning.outputs.changed == 'true'
+        if: github.ref_type != 'tag' && steps.versioning.outputs.changed == 'true' && steps.versioning.outputs.is_tagged != 'true'
         env:
           VERSION_TAG: ${{ steps.versioning.outputs.version_tag }}
         run: |
@@ -52,7 +52,7 @@ jobs:
           git tag "$VERSION_TAG"
           git push origin "$VERSION_TAG"
       - name: Run GoReleaser
-        if: github.ref_type == 'tag' || steps.versioning.outputs.changed == 'true'
+        if: github.ref_type == 'tag' || steps.versioning.outputs.changed == 'true' || steps.versioning.outputs.is_tagged == 'true'
         uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser

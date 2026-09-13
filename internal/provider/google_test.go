@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"math"
 	"net/http"
@@ -100,6 +101,49 @@ func TestGoogleRequest(t *testing.T) {
 	cancel()
 	if _, err := (Google{}).People(ctx); err == nil {
 		t.Fatal("cancellation ignored")
+	}
+}
+
+func TestGoogleMixedCaseCookieDomains(t *testing.T) {
+	for _, domain := range []string{".GOOGLE.COM", "www.Google.Com"} {
+		for _, legacy := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/legacy=%t", domain, legacy), func(t *testing.T) {
+				export := strings.ReplaceAll(cookieFixture, ".google.com", domain)
+				cookies, err := ParseCookies(strings.NewReader(export), time.Now())
+				if err != nil {
+					t.Fatal(err)
+				}
+				if cookies[0].Domain != strings.ToLower(domain) {
+					t.Fatalf("domain not normalized: %q", cookies[0].Domain)
+				}
+				if legacy {
+					cookies[0].Domain = domain // #nosec G124 -- only vary domain spelling; security attributes remain set by ParseCookies.
+				}
+				// Exercise persisted sessions as well as fresh imports.
+				data, err := json.Marshal(GoogleSession{Cookies: cookies})
+				if err != nil {
+					t.Fatal(err)
+				}
+				var session GoogleSession
+				if err := json.Unmarshal(data, &session); err != nil {
+					t.Fatal(err)
+				}
+				calls := 0
+				g := Google{Session: session, Client: &http.Client{Transport: roundTrip(func(r *http.Request) (*http.Response, error) {
+					calls++
+					if r.Header.Get("Cookie") != "__Secure-1PSID=test-session" {
+						t.Error("session cookie was not sent")
+					}
+					return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader(googleFixture(t)))}, nil
+				})}}
+				if _, err := g.People(context.Background()); err != nil {
+					t.Fatal(err)
+				}
+				if calls != 1 {
+					t.Fatalf("request count = %d", calls)
+				}
+			})
+		}
 	}
 }
 
