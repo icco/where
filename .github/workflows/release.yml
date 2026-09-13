@@ -3,40 +3,56 @@ on:
   push:
     branches:
       - main
+    tags:
+      - v*
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: release
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
-          fetch-depth: 0 # Full history, so semantic versioning can read the log.
-      - name: Set up Go
-        uses: actions/setup-go@v7
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+      - name: Verify before tagging
+        run: go test -race ./...
+      - name: Check tap credentials
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "::error::Set GH_PAT with Contents write access to icco/homebrew-tap before releasing."
+            exit 1
+          fi
       - name: Determine next version
+        if: github.ref_type != 'tag'
         id: versioning
         uses: PaulHatch/semantic-version@v6.0.3
         with:
           tag_prefix: v
-          # Patterns must be wrapped in / / to be treated as regexes. A bare string is
-          # a literal substring match, so 'feat:' misses scoped commits like 'feat(x):'.
           major_pattern: '/!:|BREAKING CHANGE:/'
           minor_pattern: '/feat(\(.+\))?:/'
           version_format: ${major}.${minor}.${patch}
       - name: Create and push tag
-        if: steps.versioning.outputs.changed == 'true'
+        if: github.ref_type != 'tag' && steps.versioning.outputs.changed == 'true'
+        env:
+          VERSION_TAG: ${{ steps.versioning.outputs.version_tag }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${{ steps.versioning.outputs.version_tag }}"
-          git push origin "${{ steps.versioning.outputs.version_tag }}"
+          # New projects start at v1.0.0, then follow semantic commit versions.
+          if [ -z "$(git tag --list 'v*')" ]; then
+            VERSION_TAG=v1.0.0
+          fi
+          git tag "$VERSION_TAG"
+          git push origin "$VERSION_TAG"
       - name: Run GoReleaser
-        if: steps.versioning.outputs.changed == 'true'
+        if: github.ref_type == 'tag' || steps.versioning.outputs.changed == 'true'
         uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
@@ -44,3 +60,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
