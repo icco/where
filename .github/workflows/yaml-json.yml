@@ -19,12 +19,9 @@ jobs:
   format:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
       - name: Install yq
         uses: dcarbone/install-yq-action@v1.3.1
       - name: Format YAML files with yq
@@ -47,16 +44,7 @@ jobs:
             echo "Formatting $file"
             yq -iP -o=json '.' "$file"
           done
-      - name: Commit formatting changes
-        if: github.event_name == 'pull_request'
-        uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_message: 'style: format YAML and JSON with yq'
-          # A literal '*.json' pathspec makes git add exit 128 in a repo that
-          # has no JSON at all, so stage everything and let the steps above
-          # decide what changed. The exclusion stays: the default GITHUB_TOKEN
-          # cannot edit files under .github/workflows.
-          file_pattern: '. :!.github/workflows/*'
-          commit_author: GitHub Actions <actions@github.com>
-          commit_user_name: github-actions[bot]
-          commit_user_email: github-actions[bot]@users.noreply.github.com
+      - name: Check formatting
+        # Validate the PR merge checkout without switching branches or writing
+        # commits; this also works for fork PRs and workflow YAML files.
+        run: git diff --exit-code

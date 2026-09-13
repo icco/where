@@ -37,8 +37,8 @@ jobs:
         uses: PaulHatch/semantic-version@v6.0.3
         with:
           tag_prefix: v
-          major_pattern: '/!:|BREAKING CHANGE:/'
-          minor_pattern: '/feat(\(.+\))?:/'
+          major_pattern: /!:|BREAKING CHANGE:/
+          minor_pattern: /feat(\(.+\))?:/
           version_format: ${major}.${minor}.${patch}
       - name: Create and push tag
         if: github.ref_type != 'tag' && steps.versioning.outputs.changed == 'true'

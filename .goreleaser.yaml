@@ -40,10 +40,10 @@ changelog:
   sort: asc
   groups:
     - title: Features
-      regexp: '^feat'
+      regexp: ^feat
       order: 0
     - title: Bug Fixes
-      regexp: '^fix'
+      regexp: ^fix
       order: 1
     - title: Other Changes
       order: 999
@@ -68,10 +68,7 @@ homebrew_casks:
       bash: completions/where.bash
       zsh: completions/_where
       fish: completions/where.fish
-    caveats: >-
-      In zsh, use `command where` to bypass the shell's built-in `where`.
-      Google uses imported Maps browser cookies. Apple requires a signed-in
-      macOS Find My session and Accessibility/Automation permission.
+    caveats: In zsh, use `command where` to bypass the shell's built-in `where`. Google uses imported Maps browser cookies. Apple requires a signed-in macOS Find My session and Accessibility/Automation permission.
     hooks:
       post:
         install: |
