@@ -32,8 +32,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Check embedded AppleScript syntax
-        run: osacompile -o "$RUNNER_TEMP/findmy.scpt" internal/provider/findmy.applescript
+      - name: Check embedded macOS automation syntax
+        run: osacompile -l JavaScript -o "$RUNNER_TEMP/findmy.scpt" internal/provider/findmy.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test Accessibility fixtures
+        run: node --test internal/provider/findmy_test.js
   release-config:
     runs-on: ubuntu-latest
     steps:
