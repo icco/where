@@ -6,8 +6,10 @@ city, IANA time zone, current local time, and location freshness.
 `where` reads **Google Maps Location Sharing** and **Apple Find My People**.
 Neither offers a public shared-people API. Google access uses an imported browser
 session; Apple access uses the signed-in macOS Find My app through Accessibility.
-These unofficial interfaces can change. Apple support is experimental and has
-not yet been verified against a live signed-in session on macOS 26.
+These unofficial interfaces can change. Google has been verified with a live
+sharing list. Apple support is experimental: authentication and a Me-only
+sidebar have been verified on macOS 26, but a nonempty sharing list and scrolling
+still need live verification.
 
 ## Install
 
@@ -25,7 +27,7 @@ go install github.com/icco/where@latest
 
 Releases contain macOS and Linux binaries for ARM64 and AMD64. Google works on
 both platforms; Apple requires macOS. The macOS install is **one Go binary**:
-the embedded AppleScript runs using the OS-provided `osascript`, with no Swift
+the embedded JavaScript automation runs using the OS-provided `osascript`, with no Swift
 toolchain, downloaded helper, or separate Find My CLI.
 
 **zsh has a builtin named `where`.** Use `command where` (as below), an absolute
@@ -77,8 +79,8 @@ unlocked desktop session. Screen Recording permission is not used.
 The adapter uses named Accessibility labels and overlapping scroll pages. An
 unknown layout, failed scrolling, or pages that do not overlap produce an error
 rather than a potentially incomplete successful list. A screen without any
-recognizable People rows also produces an error (including an empty/signed-out
-screen); support for identifying those empty states needs live validation.
+recognizable People rows also produces an error (including a signed-out screen).
+A recognized **Me** row without other people is a successful empty sharing list.
 
 Apple exposes place text, not GPS coordinates. `where` resolves unambiguous
 city/region/country labels against the bundled gazetteer. Custom labels such as
@@ -158,7 +160,9 @@ goreleaser release --snapshot --clean
 ```
 
 Tests use synthetic provider data. CI enforces 80% overall coverage and compiles
-the embedded AppleScript on macOS. Tests do not sign into personal accounts.
+the embedded JavaScript automation on macOS. Synthetic Accessibility fixtures
+run with `node --test internal/provider/findmy_test.js`; Node is needed only for
+these development tests, not for the installed CLI. Tests do not sign into personal accounts.
 Real Google cookies and a permitted Find My desktop session are needed for an
 end-to-end smoke test. A passing unit suite does not establish compatibility
 with the providers' current live interfaces.

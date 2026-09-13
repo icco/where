@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-//go:embed findmy.applescript
+//go:embed findmy.js
 var appleScript string
 
 // Apple reads the existing macOS Find My session via Accessibility.
@@ -22,7 +22,7 @@ func (Apple) People(ctx context.Context) ([]Person, error) {
 	if runtime.GOOS != "darwin" {
 		return nil, errors.New("Apple requires macOS and a signed-in Find My desktop session")
 	}
-	cmd := exec.CommandContext(ctx, "/usr/bin/osascript", "-")
+	cmd := exec.CommandContext(ctx, "/usr/bin/osascript", "-l", "JavaScript", "-")
 	cmd.Stdin = strings.NewReader(appleScript)
 	data, err := cmd.Output()
 	if err != nil {
