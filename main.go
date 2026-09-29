@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/icco/where/internal/cli"
+	"go.icco.me/where/internal/cli"
 )
 
 // Version and CommitSHA are supplied by GoReleaser.

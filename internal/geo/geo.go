@@ -15,8 +15,8 @@ import (
 	"time"
 	_ "time/tzdata" // Keep DST rules available in minimal installations.
 
-	"github.com/icco/where/internal/provider"
 	tz "github.com/ugjka/go-tz/v2"
+	"go.icco.me/where/internal/provider"
 )
 
 //go:generate go run generate.go
