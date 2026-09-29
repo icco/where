@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/spf13/cobra v1.10.2
-	github.com/ugjka/go-tz/v2 v2.2.8
+	github.com/ugjka/go-tz/v2 v2.2.9
 )
 
 require (
