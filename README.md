@@ -22,7 +22,7 @@ brew install --cask icco/tap/where
 Or install from source with Go 1.26+:
 
 ```sh
-go install github.com/icco/where@latest
+go install go.icco.me/where@latest
 ```
 
 Releases contain macOS and Linux binaries for ARM64 and AMD64. Google works on

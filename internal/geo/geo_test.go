@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icco/where/internal/provider"
+	"go.icco.me/where/internal/provider"
 )
 
 func TestGeography(t *testing.T) {

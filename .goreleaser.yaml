@@ -83,6 +83,6 @@ release:
   footer: |
     ---
     Install on macOS with `brew install --cask icco/tap/where`.
-    Or use `go install github.com/icco/where@{{ .Tag }}`.
+    Or use `go install go.icco.me/where@{{ .Tag }}`.
 
     **Full Changelog**: https://github.com/icco/where/compare/{{ .PreviousTag }}...{{ .Tag }}

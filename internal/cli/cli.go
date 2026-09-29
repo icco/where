@@ -14,10 +14,10 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/icco/where/internal/config"
-	"github.com/icco/where/internal/geo"
-	"github.com/icco/where/internal/provider"
 	"github.com/spf13/cobra"
+	"go.icco.me/where/internal/config"
+	"go.icco.me/where/internal/geo"
+	"go.icco.me/where/internal/provider"
 )
 
 type dependencies struct {

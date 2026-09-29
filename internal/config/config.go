@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/icco/where/internal/provider"
+	"go.icco.me/where/internal/provider"
 )
 
 // Config describes the enabled providers. No Apple password is stored.

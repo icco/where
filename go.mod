@@ -1,4 +1,4 @@
-module github.com/icco/where
+module go.icco.me/where
 
 go 1.26.0
 

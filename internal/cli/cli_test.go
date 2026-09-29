@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icco/where/internal/config"
-	"github.com/icco/where/internal/geo"
-	"github.com/icco/where/internal/provider"
+	"go.icco.me/where/internal/config"
+	"go.icco.me/where/internal/geo"
+	"go.icco.me/where/internal/provider"
 )
 
 var testNow = time.Date(2026, 3, 8, 7, 0, 0, 0, time.UTC)
