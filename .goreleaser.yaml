@@ -71,9 +71,9 @@ homebrew_casks:
     caveats: In zsh, use `command where` to bypass the shell's built-in `where`. Google uses imported Maps browser cookies. Apple requires a signed-in macOS Find My session and Accessibility/Automation permission.
     hooks:
       post:
-        install: |
-          if OS.mac?
-            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/where"]
+        install_steps: |
+          on_macos do
+            run '/usr/bin/xattr', args: ['-dr', 'com.apple.quarantine', '{{ .StagedPath }}/where']
           end
 release:
   github:
