@@ -47,12 +47,6 @@ changelog:
       order: 1
     - title: Other Changes
       order: 999
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
-      - '^style:'
 homebrew_casks:
   - name: where
     directory: Casks
